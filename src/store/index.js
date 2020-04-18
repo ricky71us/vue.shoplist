@@ -18,15 +18,15 @@ const actions = {
   async signInAction({commit}, user) {
     const signInUser = await dataService.signIn(user);
     console.log(signInUser);
-    commit("signIn", signInUser);      
+    commit("signIn", signInUser.data);      
   },  
 }
 
 const getters = {
-  getUserName: state =>
-    (state.user === null || state.user.firstname === undefined)
+  getUserName: state => 
+    state.user.firstname === undefined
       ? 'Guest'
-      : state.user.firstname + ' ' + state.user.lastname, 
+      : state.user.firstname + ' ' + state.user.lastname   
 }
 
 export default new Vuex.Store({

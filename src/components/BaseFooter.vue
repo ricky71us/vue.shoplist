@@ -1,4 +1,3 @@
-
 <template>
   <v-footer
     color="primary lighten-1"
@@ -22,7 +21,7 @@
         class="primary lighten-2 py-4 text-center white--text"
         cols="12"
       >
-        {{ new Date().getFullYear() }} — <strong>Shopping List App</strong>
+        {{ new Date().getFullYear() }} — <strong>BMG Tech</strong>
       </v-col>
     </v-row>
   </v-footer>
