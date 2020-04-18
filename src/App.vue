@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <BaseHeader></BaseHeader>
+    <BaseHeader/>
     <!-- <v-app-bar app color="primary" dark>
       <div class="d-flex align-center">
         <v-img
@@ -36,6 +36,8 @@
     <v-content>
       <router-view />
     </v-content>
+    <v-spacer></v-spacer>
+    <BaseFooter/>
   </v-app>
 </template>
 

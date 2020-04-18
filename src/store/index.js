@@ -4,27 +4,34 @@ import { dataService } from '../shared';
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
-  state: {
-    user: {id:'', pwd:''}
-  },
-  mutations: {
-    signIn(state, user){
-      state.user = user;
-    }
-  },
-  actions: {
-    async signInAction({commit}, user) {
-      const signInUser = await dataService.signIn(user);
-      commit("signIn", signInUser);      
-    }
-  },
-  modules: {
-  },
-  getters: {   
-    getUserName: state =>
-    state.user.firstname === undefined
+const state = {
+  user: {id:'', pwd:''},  
+}
+
+const mutations = {
+  signIn(state, user){
+    state.user = user;
+  },  
+}
+
+const actions = {
+  async signInAction({commit}, user) {
+    const signInUser = await dataService.signIn(user);
+    console.log(signInUser);
+    commit("signIn", signInUser);      
+  },  
+}
+
+const getters = {
+  getUserName: state =>
+    (state.user === null || state.user.firstname === undefined)
       ? 'Guest'
       : state.user.firstname + ' ' + state.user.lastname, 
-  }
+}
+
+export default new Vuex.Store({
+  state,
+  mutations,
+  actions,  
+  getters
 })

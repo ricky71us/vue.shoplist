@@ -28,9 +28,13 @@
     <v-card-actions>
       <v-btn color="success" v-on:click="register">Register</v-btn>
       <v-spacer></v-spacer>
-      <v-btn color="info" @click="validate" v-on:click="signInUser">Login</v-btn>
+      <v-btn color="info" v-on:click="signInUser">Login</v-btn>
     </v-card-actions>
-    <v-sheet v-if="this.msg" color="orange lighten-2">{{ this.msg }}</v-sheet>
+    <!-- <v-sheet v-if="this.msg" color="orange lighten-2">{{ this.msg }}</v-sheet> -->
+    <v-snackbar v-model="isMsg" :bottom="true" :right="true" :timeout="4000">
+      {{ this.msg }}
+      <!-- <v-btn color="pink" text @click="snackbar = false">Close</v-btn> -->
+    </v-snackbar>
   </v-card>
 </template>
 
@@ -47,6 +51,7 @@ export default {
       showPassword: false,
       errors: [],
       msg: "",
+      isMsg: false,
       valid: true,
       emailRules: [
         v => !!v || "E-mail is required",
@@ -68,14 +73,14 @@ export default {
         await this.signInAction(userInfo);
         if (this.currentUser !== null)
           this.$router.push({ path: "/dashboard" });
-        else this.msg = "Invalid Credentials";
+        else {
+          this.msg = "Invalid Credentials";
+          this.isMsg = !(this.msg === "");
+          }
       }
     },
     register() {
       this.$router.push({ path: "register" });
-    },
-    validate() {
-      this.$refs.form.validate();
     }
   },
   computed: {
