@@ -17,12 +17,12 @@
       >
         {{ link }}
       </v-btn>
-      <v-col
+      <!-- <v-col
         class="primary lighten-2 py-4 text-center white--text"
         cols="12"
       >
         {{ new Date().getFullYear() }} — <strong>BMG Tech</strong>
-      </v-col>
+      </v-col> -->
     </v-row>
   </v-footer>
 </template>
