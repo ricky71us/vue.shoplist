@@ -5,17 +5,16 @@ import Dashboard from "../views/Dashboard.vue";
 import Register from "../views/Register.vue";
 import About from "../views/About.vue";
 import Home from "../views/Home.vue";
-import CategoryItems from "../views/CategoryItems.vue";
-import Stores from "../views/Stores.vue";
-import Categories from "../views/Categories.vue";
-import Items from "../views/Items.vue";
+import ManageCategories from "../views/ManageCategories.vue";
+import ManageStores from "../views/ManageStores.vue";
+import ManageItems from "../views/ManageItems.vue";
 
 Vue.use(VueRouter);
-const parseProps = r => ({ id: parseInt(r.params.id) });
+//const parseProps = r => ({ id: parseInt(r.params.id) });
 const routes = [
   {
     path: "/",
-    redirect: "/login",
+    redirect: "/Home",
   },
   {
     path: "/dashboard",
@@ -38,35 +37,29 @@ const routes = [
     component: About,
   },
   {
-    path: "/home",
+    path: "/Home",
     name: "Home",
     component: Home,
+  },     
+  {
+    path: "/managecategories",
+    name: "ManageCategories",
+    component: ManageCategories,
   },  
   {
-    path: '/categoryItems/:id',
-    name: 'CategoryItems',
-    props: parseProps,
-    component: CategoryItems,
-  },
+    path: "/managestores",
+    name: "ManageStores",
+    component: ManageStores,
+  },  
   {
-    path: "/stores",
-    name: "Stores",
-    component: Stores,
-  },
-  {
-    path: "/items",
-    name: "Items",
-    component: Items,
-  },
-  {
-    path: "/categories",
-    name: "Categories",
-    component: Categories,
+    path: "/manageitems",
+    name: "ManageItems",
+    component: ManageItems,
   },  
 ];
 
 const router = new VueRouter({
-  mode: "history",
+ // mode: "history",
   base: process.env.BASE_URL,
   routes,
 });

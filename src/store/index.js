@@ -11,7 +11,7 @@ const state = {
   items: [],
   categories: [],
   categoryStores: [],
-  storeItems: [],
+  catStoreItems: [],
 };
 
 const mutations = {
@@ -41,16 +41,25 @@ const mutations = {
   getCategoryStores(state, categoryStores) {
     state.categoryStores = categoryStores;
   },
-  getStoreItems(state, storeItems) {
-    state.storeItems = storeItems;
+  getCatStoreItems(state, catStoreItems) {
+    state.catStoreItems = catStoreItems;
   },
   addCategoryStore(state, categoryStore) {
-    console.log(categoryStore);
+    //console.log(`categoryStore: ${categoryStore}`);
     state.categoryStores.unshift(...categoryStore); // mutable addition
   },
   deleteCategoryStore(state, categoryStoreId) {
     state.categoryStores = [
       ...state.categoryStores.filter((p) => p.id !== categoryStoreId),
+    ];
+  },
+  addStoreItem(state, catStoreItem) {
+    //console.log(`catStoreItem: ${catStoreItem}`);
+    if (catStoreItem) state.catStoreItems.unshift(...catStoreItem); // mutable addition
+  },
+  deleteCatStoreItem(state, catStoreId) {
+    state.catStoreItems = [
+      ...state.catStoreItems.filter((p) => p.id !== catStoreId),
     ];
   },
 };
@@ -85,8 +94,8 @@ const actions = {
     commit("getCategoryStores", categoryStores);
   },
   async getStoreItemsAction({ commit }) {
-    const storeItems = await dataService.getStoreItems();
-    commit("getStoreItems", storeItems);
+    const catStoreItems = await dataService.getCatStoreItems();
+    commit("getCatStoreItems", catStoreItems);
   },
   async getItemsAction({ commit }) {
     const items = await dataService.getItems();
@@ -96,14 +105,20 @@ const actions = {
     const addedCategoryStore = await dataService.addCategoryStore(
       categoryStore
     );
-    commit("addCategoryStore", addedCategoryStore.data);
+    commit("addCategoryStore", addedCategoryStore);
   },
   async deleteCategoryStoreAction({ commit }, categoryStore) {
-    const deletedCategoryStoreId = await dataService.deleteCategoryStore(
-      categoryStore
-    );
-    console.log(deletedCategoryStoreId);
+    await dataService.deleteCategoryStore(categoryStore);
     commit("deleteCategoryStore", categoryStore.id);
+  },
+  async addStoreItemsAction({ commit }, storeItem) {
+    //console.log(`storeItem: ${storeItem}`);
+    const addedStoreItem = await dataService.addStoreItem(storeItem);
+    commit("addStoreItem", addedStoreItem);
+  },
+  async deleteCatStoreItemAction({ commit }, catStoreItem) {
+    await dataService.deleteCatStoreItem(catStoreItem);
+    commit("deleteCatStoreItem", catStoreItem.id);
   },
 };
 
@@ -122,19 +137,24 @@ const getters = {
     state.categoryStores.filter(
       (v) => parseInt(v.categoryId) === parseInt(catId)
     ),
-  getItemsByStores: (state) => (storeId) =>
-    state.storeItems.filter((v) => parseInt(v.storeId) === parseInt(storeId)),
+  getItemsByCatStoresId: (state) => (catStoreId) =>
+    state.catStoreItems.filter(
+      (v) => parseInt(v.catstoreId) === parseInt(catStoreId)
+    ),
+  getCatStore: (state) => (catId, storeId) =>
+    state.categoryStores.find(
+      (v) => v.categoryId === catId && v.storeId === storeId
+    ),
   selectedCategoryStoreItems(state, getters) {
     let items = [];
     let children = [];
     let subChildren = [];
     try {
-      items = [];
+      items = [];      
       state.categories
         .sort((a, b) => {
           const bandA = a.name.toUpperCase();
           const bandB = b.name.toUpperCase();
-
           let comparison = 0;
           if (bandA > bandB) {
             comparison = 1;
@@ -146,28 +166,28 @@ const getters = {
         .forEach((category) => {
           let catStores = [];
           catStores = getters.getStoresByCategory(category.id);
-          // console.log(`cat Name: ${category.name}`)
-          // console.log(catStores.length);
           if (catStores.length > 0) {
             children = [];
             catStores
               .sort((a, b) => a.categoryId - b.categoryId)
               .filter((c) => c.storeId > 0)
               .forEach((catStore) => {
-                // console.log(`cat Id : ${category.id}`);
-                // console.log(`   store Id : ${catStore.storeId}`);
-                let storeItems = getters.getItemsByStores(catStore.storeId);
-                subChildren = [];
-                if (storeItems.length > 0) {
-                  storeItems.forEach((storeItem) => {
-                    // console.log(`     item ID : ${storeItem.itemId}`);
-                    let item = getters.getItemById(storeItem.itemId);
-                    subChildren.push({
-                      id: storeItem.itemId,
-                      name: item ? item.name : "",
-                      children: [],
+                if (catStore.id) {
+                  let catStoreItems = getters.getItemsByCatStoresId(
+                    catStore.id
+                  );
+                  //console.log(catStore.id);
+                  subChildren = [];
+                  if (catStoreItems.length > 0) {
+                    catStoreItems.forEach((storeItem) => {
+                      let item = getters.getItemById(storeItem.itemId);
+                      subChildren.push({
+                        id: storeItem.itemId,
+                        name: item ? item.name : "",
+                        children: [],
+                      });
                     });
-                  });
+                  }
                 }
                 let store = getters.getStoreById(catStore.storeId);
                 children.push({

@@ -64,7 +64,7 @@
 import axios from "axios";
 
 export default {
-  name: "savestore",
+  name: "BaseAddStoreCategory",
 
   props: ["updateStore"],
 

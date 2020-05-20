@@ -1,17 +1,24 @@
 <template>
-  <v-banner single-line :sticky="sticky">
-    <v-snackbar v-show="this.message">{{this.message}}</v-snackbar>
-    <template v-slot:actions>
-      <v-container>
-        <v-row>
-          <v-col cols="6" v-for="store in stores" :key="store.id">
-            <BaseStore v-bind="store" />
-            <v-spacer />
-          </v-col>
+  <div>
+     <stores />
+    <v-banner single-line :sticky="sticky">
+      <v-snackbar v-show="this.message">{{this.message}}</v-snackbar>
+
+     
+
+      <template v-slot:actions>
+        <v-container>
+
+        <v-row>            
+            <v-col cols="6" v-for="store in stores" :key="store.id">
+               <BaseStore v-bind="store" />  
+              <v-spacer />
+            </v-col>
         </v-row>
-      </v-container>
-    </template>
-  </v-banner>
+        </v-container>
+      </template>
+    </v-banner>
+  </div>
 </template>
 <script>
 import { mapActions, mapState } from "vuex";

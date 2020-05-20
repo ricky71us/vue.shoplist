@@ -1,147 +1,100 @@
 <template>
   <div>
-    <v-dialog v-model="dialog" width="500" :key="category.id" :id="category.id">
-      <template v-slot:activator="{ on }">
-        <v-btn color="primary" dark v-on="on" @click="editCategory(category)">Add New Category</v-btn>
-      </template>
-      <v-card>
-        <v-card-title class="headline grey lighten-2" primary-title>Category Details</v-card-title>
+    <div>
+      <v-dialog v-model="dialogStore" width="500" :key="store.id" :id="store.id">
+        <template v-slot:activator="{ on }">
+          <v-btn left class="ma-2" @click.native.stop v-on="on">Add Category</v-btn>
+        </template>
+        <v-card>
+          <v-card-title class="headline grey lighten-2" primary-title>New Categories</v-card-title>
+          <v-card-text>
+            <v-container fluid>
+              <v-autocomplete
+                v-model="el"
+                :items="this.getNewCategories(categoryStores)"
+                item-text="name"
+                item-value="id"
+                chip
+                return-object
+                multiple
+              ></v-autocomplete>
+            </v-container>
+            <v-btn
+              :disabled="!validStore"
+              color="success"
+              @click="addStoresToCategory()"
+              class="mr-4"
+              @click.stop="dialogStore = false"
+            >Save</v-btn>
 
-        <v-card-text>
-          <v-text-field
-            v-model="updateCategory.name"
-            :counter="100"
-            :rules="nameRules"
-            label="Category Name"
-            required
-          ></v-text-field>
-
-          <v-text-field v-model="updateCategory.shortname" label="Short Name"></v-text-field>
-
-          <v-text-field v-model="updateCategory.description" label="Description"></v-text-field>
-
-          <v-btn
-            :disabled="!valid"
-            color="success"
-            class="mr-4"
-            @click="saveCategory()"
-            @click.stop="dialog = false"
-          >Save</v-btn>
-
-          <v-btn
-            color="error"
-            class="mr-4"
-            @click="addNewCategory"
-            @click.stop="dialog = false"
-          >Cancel</v-btn>
-        </v-card-text>
-
-        <v-divider></v-divider>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+            <v-btn
+              :disabled="!validStore"
+              color="info"
+              class="mr-4"
+              @click.stop="dialogStore = false"
+            >Cancel</v-btn>
+          </v-card-text>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-
+import { mapState, mapActions } from "vuex";
 export default {
-  name: "category",
-
+  name: "BaseAddCategory",
   data() {
     return {
-      categories: null,
-      category: {
+      
+      el: [],
+      store: {
         id: 0,
         name: null,
         shortName: null,
         description: null
       },
-      updateCategory: {
+      localStore: {
         id: 0,
         name: null,
         shortName: null,
         description: null
       },
-      valid: true,
-      name: "",
+      valid: false,
       nameRules: [v => !!v || "Name is required"],
-      select: null,
-      checkbox: false,
-      dialog: false,
-      dialogEdit: []
+      validStore: true,
+      dialogStore: false,
+      categoryStore: []
     };
   },
 
-  mounted() {
-    this.getCategories();
+  computed: {
+    ...mapState(["categories", "categoryStores"]),
+    getNewCategories: state => el => {
+      let selectedCategories = el      
+      .map(cat => cat.categoryId);
+      return state.categories.filter(
+        a => selectedCategories.indexOf(a.id) === -1
+      );
+    }
   },
-
   methods: {
-    getCategories: function() {
-      axios
-        .get("http://phpapi.bmgtech.ca/index.php/api/categories")
-        .then(response => (this.categories = response.data));
+    ...mapActions(["addCategoryStoreAction"]),
+    remove(item) {
+      const index = this.el.indexOf(item.name);
+      if (index >= 0) this.el.splice(index, 1);
     },
-    deleteCategory: function(index) {      
-      if (confirm("Do you really want to delete?")) {
-        axios
-          .delete(
-            "http://phpapi.bmgtech.ca/index.php/api/categories?id=" + index
-          )
-          .then(() => {            
-            this.categories.splice(
-              this.categories.findIndex(x => x.id === index),
-              1
-            );
-          })
-          .catch(() => {            
-          });
-      }
-    },
-    editCategory: function(category) {
-      this.updateCategory = category;
-    },
-    addNewCategory: function() {
-      this.updateCategory = this.category;
-    },
-    saveCategory: function() {
-      //if (this.$refs.form.validate()) {
-
-      if (this.updateCategory.id > 0) {
-        axios
-          .put(
-            "http://phpapi.bmgtech.ca/index.php/api/categories?id=" +
-              this.updateCategory.id,
-            this.updateCategory
-          )
-          .then(() => {            
-            this.updateCategory = this.category;            
-          })
-          .catch(() => {            
-          });
-      } else {
-        axios
-          .post(
-            "http://phpapi.bmgtech.ca/index.php/api/categories",
-            this.updateCategory
-          )
-          .then(() => {
-            this.getCategories();
-            this.updateCategory = this.category;
-          })
-          .catch(() => {            
-          });        
-      }
-    },
-    validate() {
-      if (this.$refs.form.validate()) {
-        this.snackbar = true;
-      }
+    addStoresToCategory() {
+      this.el.forEach(item => {
+        this.addCategoryStoreAction({
+          categoryId: item.id,
+          storeId: 0
+        });
+      });
     }
   }
 };

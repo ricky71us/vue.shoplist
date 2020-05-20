@@ -1,19 +1,6 @@
 <template>
   <div id="app">
     <v-form ref="form" v-model="valid" lazy-validation></v-form>
-    <v-spacer />        
-    <BaseAddCategory />
-    <v-spacer />
-    <v-expansion-panels focusable>
-      <v-expansion-panel v-for="store in categories" :key="store.id">
-        <v-expansion-panel-header>{{store.name}}</v-expansion-panel-header>
-        <v-expansion-panel-content>
-          <v-btn>Add New Store</v-btn>
-          <v-spacer></v-spacer>
-          <BaseStoreItems />
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </v-expansion-panels>
     <v-simple-table>
       <template v-slot:default>
         <thead>
@@ -146,9 +133,10 @@
 
 <script>
 import axios from "axios";
+import { mapState } from "vuex";
 
 export default {
-  name: "category",
+  name: "BaseManageCategories",
 
   data() {
     return {
@@ -186,23 +174,18 @@ export default {
         .then(response => (this.categories = response.data));
     },
     deleteCategory: function(index) {
-      //console.log(index);
       if (confirm("Do you really want to delete?")) {
         axios
           .delete(
             "http://phpapi.bmgtech.ca/index.php/api/categories?id=" + index
           )
           .then(() => {
-            //console.log(this.categories);
-            //console.log(this.categories.findIndex(x => x.id === index));
             this.categories.splice(
               this.categories.findIndex(x => x.id === index),
               1
             );
           })
-          .catch(() => {
-            //console.log(());
-          });
+          .catch(() => {});
       }
     },
     editCategory: function(category) {
@@ -212,10 +195,6 @@ export default {
       this.updateCategory = this.category;
     },
     saveCategory: function() {
-      //console.log(this.$refs.form.validate());
-      console.log(this.updateCategory.id);
-      //if (this.$refs.form.validate()) {
-
       if (this.updateCategory.id > 0) {
         axios
           .put(
@@ -223,14 +202,10 @@ export default {
               this.updateCategory.id,
             this.updateCategory
           )
-          .then(response => {
-            console.log(response);
+          .then(() => {
             this.updateCategory = this.category;
-            //console.log("Record Updated Successfully!");
           })
-          .catch(() => {
-            //console.log(());
-          });
+          .catch(() => {});
       } else {
         axios
           .post(
@@ -241,10 +216,7 @@ export default {
             this.getCategories();
             this.updateCategory = this.category;
           })
-          .catch(() => {
-            //console.log(error);
-          });
-        //}
+          .catch(() => {});
       }
     },
     validate() {
@@ -252,6 +224,9 @@ export default {
         this.snackbar = true;
       }
     }
+  },
+  computed: {
+    ...mapState(["categories"])
   }
 };
 </script>

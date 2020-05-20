@@ -1,9 +1,8 @@
 <template>
   <div class="home">
     <v-form ref="form" v-model="valid" lazy-validation></v-form>
-
     <v-expansion-panels focusable>
-      <BaseNewCategory></BaseNewCategory>
+      <BaseAddCategory></BaseAddCategory>
       <v-expansion-panel v-for="category in selectedCategoryStoreItems" :key="category.id">
         <v-expansion-panel-header>
           {{category.name}}
@@ -15,7 +14,7 @@
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <div class="text-center">
-            <BaseAddNewStore :catId="category.id"></BaseAddNewStore>
+            <BaseAddStore :catId="category.id"></BaseAddStore>
           </div>
           <v-expansion-panels focusable>
             <v-expansion-panel v-for="child in category.children" :key="child.id">
@@ -28,12 +27,20 @@
                 </div>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
+                <div class="text-center">
+                  <BaseAddItem :catStoreId="getCatStore(category.id, child.id).id"></BaseAddItem>
+                </div>
                 <v-expansion-panels focusable>
                   <v-expansion-panel v-for="subChild in child.children" :key="subChild.id">
                     <v-expansion-panel-header>
                       {{subChild.name}}
                       <div>
-                        <v-btn class="ma-1" small icon>
+                        <v-btn
+                          class="ma-1"
+                          small
+                          icon
+                          @click.native="deleteItem(subChild, category.id, child.id)"
+                        >
                           <v-icon small>mdi-close</v-icon>
                         </v-btn>
                       </div>
@@ -61,7 +68,6 @@ export default {
   }),
   created() {
     this.getAllCategories();
-    //this.selectedCategoryStoreItems();
   },
   mounted() {},
   methods: {
@@ -71,7 +77,8 @@ export default {
       "getStoresAction",
       "getStoreItemsAction",
       "getItemsAction",
-      "deleteCategoryStoreAction"
+      "deleteCategoryStoreAction",
+      "deleteCatStoreItemAction"
     ]),
     async getAllCategories() {
       try {
@@ -86,9 +93,6 @@ export default {
         console.log(error);
       }
     },    
-    selectItems(categoryId) {
-      this.$router.push({ name: "CategoryItems", params: { id: categoryId } });
-    },
     deleteCategory(category) {
       //alert(`Are you sure you want to delete this category ${category.id}`);
       let categoryStoresToDelete = [];
@@ -102,21 +106,32 @@ export default {
       });
     },
     deleteStore(store, categoryId) {
-      //alert(`Are you sure you want to delete this category ${category.id}`);      
+      //alert(`Are you sure you want to delete this category ${category.id}`);
       let categoryStoresToDelete = [];
       this.categoryStores.forEach(catStore => {
-        if (catStore.storeId === store.id && catStore.categoryId === categoryId ) {
+        if (
+          catStore.storeId === store.id &&
+          catStore.categoryId === categoryId
+        ) {
           categoryStoresToDelete.push(catStore);
         }
       });
-       categoryStoresToDelete.forEach(catStore => {
-         this.deleteCategoryStoreAction(catStore);
-       });
+      categoryStoresToDelete.forEach(catStore => {
+        this.deleteCategoryStoreAction(catStore);
+      });
+    },
+    deleteItem(item, categoryId, storeId) {
+      //alert(`Are you sure you want to delete this category ${category.id}`);
+      let catStore  = this.getCatStore(categoryId, storeId)
+      console.log(catStore);
+      let catStoreItemToDelete = this.catStoreItems.find((v) => v.catstoreId === catStore.id && v.itemId === item.id)
+      console.log(catStoreItemToDelete);
+      this.deleteCatStoreItemAction(catStoreItemToDelete);
     }
   },
   computed: {
-    ...mapState(["categories", "categoryStores"]),
-    ...mapGetters(["selectedCategoryStoreItems"])
+    ...mapState(["categories", "categoryStores", "catStoreItems"]),
+    ...mapGetters(["selectedCategoryStoreItems", "getCatStore"])
   }
 };
 </script>

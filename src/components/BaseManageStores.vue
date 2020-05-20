@@ -43,7 +43,7 @@ import savestore from "@/components/SaveStore.vue";
 import editstore from "@/components/EditStore.vue";
 
 export default {
-  name: "store",
+  name: "BaseManageStores",
 
   components: {
     savestore,

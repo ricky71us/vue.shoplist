@@ -56,12 +56,10 @@
       {{ this.msg }}
     </v-sheet>-->
 
-    <v-snackbar v-model="isMsg" :bottom="true" :right="true" :timeout=4000>
+    <v-snackbar v-model="isMsg" :bottom="true" :right="true" :timeout="4000">
       {{ this.msg }}
       <!-- <v-btn color="pink" text @click="snackbar = false">Close</v-btn> -->
     </v-snackbar>
-
-   
   </v-card>
 </template>
 <script>
@@ -107,13 +105,11 @@ export default {
           phone: this.phone
         };
         console.log("inside");
-        await dataService
-          .register(data)        
-          .then(response => {
-            this.msg = response.message;
-            this.isMsg = !(this.msg === "")   
-            console.log(this.msg.length);         
-          });            
+        await dataService.register(data).then(response => {
+          this.msg = response.message;
+          this.isMsg = !(this.msg === "");
+          console.log(this.msg.length);
+        });
       }
     },
     submit() {
@@ -157,12 +153,6 @@ export default {
     validate() {
       this.$refs.form.validate();
     }
-  },
-  
-  // computed: {
-  //     messageToDisplay() {
-  //       if (this.msg === "")
-  //     }
-  // }
+  }
 };
 </script>
