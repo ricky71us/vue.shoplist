@@ -14,9 +14,7 @@
             :rules="nameRules"
             label="Category Name"
             required
-          ></v-text-field>
-
-          <v-text-field v-model="updateCategory.shortname" label="Short Name"></v-text-field>
+          ></v-text-field>          
 
           <v-text-field v-model="updateCategory.description" label="Description"></v-text-field>
 
@@ -57,14 +55,12 @@ export default {
       categories: null,
       category: {
         id: 0,
-        name: null,
-        shortName: null,
+        name: null,        
         description: null
       },
       updateCategory: {
         id: 0,
-        name: null,
-        shortName: null,
+        name: null,        
         description: null
       },
       valid: true,

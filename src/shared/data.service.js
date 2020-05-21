@@ -41,11 +41,9 @@ const getStores = async function() {
 
 const addStore = async function(store) {
   try {
-    console.log("Inside add store dataservice");
-    console.log(store);
     const response = await axios.post(`${API}/stores`, store);
-    let data = parseList(response);
-    return data;
+    const addedStore = parseItem(response, 201);
+    return addedStore;
   } catch (error) {
     console.log(error);
     return error.message;
@@ -54,9 +52,9 @@ const addStore = async function(store) {
 
 const updateStore = async function(store) {
   try {
-    const response = await axios.post(`${API}/stores`, store);
-    let data = parseList(response);
-    return data;
+    const response = await axios.put(`${API}/stores?id=${store.id}`, store);
+    parseItem(response, 200);
+    return store;
   } catch (error) {
     console.log(error);
     return error.message;
@@ -65,7 +63,7 @@ const updateStore = async function(store) {
 
 const deleteStore = async function(store) {
   try {
-    const response = await axios.post(`${API}/stores`, store);
+    const response = await axios.delete(`${API}/stores?id=${store.id}`, store);
     let data = parseList(response);
     return data;
   } catch (error) {
@@ -84,10 +82,37 @@ const getCategories = async function() {
   }
 };
 
-
-const addCategory = async function() {
+const addCategory = async function(category) {
   try {
-    const response = await axios.get(`${API}/categories`);
+    const response = await axios.post(`${API}/categories`, category);
+    const addedCategory = parseItem(response, 201);
+    return addedCategory;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+const updateCategory = async function(category) {
+  try {    
+    const response = await axios.put(
+      `${API}/categories?id=${category.id}`,
+      category
+    );
+    parseItem(response, 200);
+    return category;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+const deleteCategory = async function(category) {
+  try {
+    const response = await axios.delete(
+      `${API}/categories?id=${category.id}`,
+      category
+    );
     let data = parseList(response);
     return data;
   } catch (error) {
@@ -129,7 +154,7 @@ const getCatStoreItems = async function() {
 };
 
 const addCategoryStore = async function(categoryStore) {
-  try {    
+  try {
     const response = await axios.post(`${API}/categorystores`, categoryStore);
     const addedCategoryStore = parseItem(response, 201);
     return addedCategoryStore;
@@ -141,8 +166,11 @@ const addCategoryStore = async function(categoryStore) {
 
 const deleteCategoryStore = async function(categoryStore) {
   try {
-    //console.log(categoryStore);    
-    const response = await axios.delete(`${API}/categorystores?id=${categoryStore.id}`, categoryStore);
+    //console.log(categoryStore);
+    const response = await axios.delete(
+      `${API}/categorystores?id=${categoryStore.id}`,
+      categoryStore
+    );
     let data = parseList(response);
     //console.log(response);
     return data;
@@ -153,10 +181,10 @@ const deleteCategoryStore = async function(categoryStore) {
 };
 
 const addStoreItem = async function(storeItem) {
-  try {    
+  try {
     const response = await axios.post(`${API}/storeitems`, storeItem);
     const addedStoreItem = parseItem(response, 201);
-    return addedStoreItem;    
+    return addedStoreItem;
   } catch (error) {
     console.error(error);
     return null;
@@ -165,8 +193,11 @@ const addStoreItem = async function(storeItem) {
 
 const deleteCatStoreItem = async function(catStoreItem) {
   try {
-    console.log(catStoreItem);    
-    const response = await axios.delete(`${API}/storeitems?id=${catStoreItem.id}`, catStoreItem);
+    console.log(catStoreItem);
+    const response = await axios.delete(
+      `${API}/storeitems?id=${catStoreItem.id}`,
+      catStoreItem
+    );
     let data = parseList(response);
     console.log(response);
     return data;
@@ -208,6 +239,8 @@ export const dataService = {
   deleteStore,
   getCategories,
   addCategory,
+  updateCategory,
+  deleteCategory,
   getItems,
   getCategoryStores,
   getCatStoreItems,

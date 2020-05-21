@@ -8,6 +8,7 @@ import Home from "../views/Home.vue";
 import ManageCategories from "../views/ManageCategories.vue";
 import ManageStores from "../views/ManageStores.vue";
 import ManageItems from "../views/ManageItems.vue";
+import test from "../views/test.vue";
 
 Vue.use(VueRouter);
 //const parseProps = r => ({ id: parseInt(r.params.id) });
@@ -55,6 +56,11 @@ const routes = [
     path: "/manageitems",
     name: "ManageItems",
     component: ManageItems,
+  },  
+  {
+    path: "/test",
+    name: "test",
+    component: test,
   },  
 ];
 

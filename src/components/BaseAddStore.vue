@@ -55,14 +55,12 @@ export default {
       el: [],
       store: {
         id: 0,
-        name: null,
-        shortName: null,
+        name: null,        
         description: null
       },
       localStore: {
         id: 0,
-        name: null,
-        shortName: null,
+        name: null,        
         description: null
       },
       valid: false,

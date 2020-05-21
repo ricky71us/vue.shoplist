@@ -26,8 +26,7 @@
             :rules="nameRules"
             label="Store Name"
             required
-          ></v-text-field>
-          <v-text-field v-model="localStore.shortname" label="Short Name"></v-text-field>
+          ></v-text-field>          
           <v-text-field v-model="localStore.description" label="Description"></v-text-field>
           <v-btn
             :disabled="!validStore"
@@ -63,14 +62,12 @@ export default {
     return {
       store: {
         id: 0,
-        name: null,
-        shortName: null,
+        name: null,        
         description: null
       },
       localStore: {
         id: 0,
-        name: null,
-        shortName: null,
+        name: null,        
         description: null
       },
       valid: false,
@@ -109,8 +106,7 @@ export default {
       //   },
       //   set: function(newValue) {
       //     (this.id = newValue.id),
-      //       (this.name = newValue.name),
-      //       (this.shortName = newValue.shortName),
+      //       (this.name = newValue.name),      
       //       (this.description = newValue.description);
       //   }
       // }

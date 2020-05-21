@@ -29,8 +29,6 @@
               required
             ></v-text-field>
 
-            <v-text-field v-model="localStore.shortname" label="Short Name"></v-text-field>
-
             <v-text-field v-model="localStore.description" label="Description"></v-text-field>
 
             <v-btn
@@ -75,8 +73,7 @@ export default {
       },
       set: function(newValue) {
         (this.id = newValue.id),
-          (this.name = newValue.name),
-          (this.shortName = newValue.shortName),
+          (this.name = newValue.name),          
           (this.description = newValue.description);
       }
     }
@@ -86,8 +83,7 @@ export default {
       stores: null,
       store: {
         id: 0,
-        name: null,
-        shortName: null,
+        name: null,        
         description: null
       },
       valid: false,

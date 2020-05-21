@@ -20,9 +20,7 @@
                       :rules="nameRules"
                       label="Item Name"
                       required
-                    ></v-text-field>
-
-                    <v-text-field v-model="updateItem.shortname" label="Short Name"></v-text-field>
+                    ></v-text-field>                    
 
                     <v-text-field v-model="updateItem.description" label="Description"></v-text-field>
 
@@ -83,9 +81,7 @@
                       :rules="nameRules"
                       label="Item Name"
                       required
-                    ></v-text-field>
-
-                    <v-text-field v-model="updateItem.shortName" label="Short Name"></v-text-field>
+                    ></v-text-field>                    
 
                     <v-text-field v-model="updateItem.description" label="Description"></v-text-field>
 
@@ -141,14 +137,12 @@ export default {
       items: null,
       item: {
         id: 0,
-        name: null,
-        shortName: null,
+        name: null,        
         description: null
       },
       updateItem: {
         id: 0,
-        name: null,
-        shortName: null,
+        name: null,        
         description: null
       },
       valid: true,

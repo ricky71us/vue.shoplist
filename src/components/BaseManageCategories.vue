@@ -7,25 +7,23 @@
           <tr>
             <th class="text-left">
               Name
-              <v-dialog v-model="dialog" width="500" :key="category.id" :id="category.id">
+              <v-dialog v-model="dialog" width="500" :key="localCategory.id" :id="localCategory.id">
                 <template v-slot:activator="{ on }">
-                  <v-icon color="primary" dark v-on="on" @click="editCategory(category)">mdi-plus</v-icon>(Add New Category)
+                  <v-icon color="primary" dark v-on="on" @click="initializeCategory()">mdi-plus</v-icon>(Add New Category)
                 </template>
                 <v-card>
                   <v-card-title class="headline grey lighten-2" primary-title>Category Details</v-card-title>
 
                   <v-card-text>
                     <v-text-field
-                      v-model="updateCategory.name"
+                      v-model="localCategory.name"
                       :counter="100"
                       :rules="nameRules"
                       label="Category Name"
                       required
                     ></v-text-field>
 
-                    <v-text-field v-model="updateCategory.shortname" label="Short Name"></v-text-field>
-
-                    <v-text-field v-model="updateCategory.description" label="Description"></v-text-field>
+                    <v-text-field v-model="localCategory.description" label="Description"></v-text-field>
 
                     <v-btn
                       :disabled="!valid"
@@ -38,7 +36,7 @@
                     <v-btn
                       color="error"
                       class="mr-4"
-                      @click="addNewCategory"
+                      @click="initializeCategory()"
                       @click.stop="dialog = false"
                     >Cancel</v-btn>
                   </v-card-text>
@@ -56,22 +54,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="category in categories" :key="category.id">
-            <td>{{ category.name }}</td>
+          <tr v-for="cat in categories" :key="cat.id">
+            <td>{{ cat.name }}</td>
             <td>
-              <v-dialog
-                v-model="dialogEdit[category.id]"
-                width="500"
-                :key="category.id"
-                :id="category.id"
-              >
+              <v-dialog v-model="dialogEdit[cat.id]" width="500" :key="cat.id" :id="cat.id">
                 <template v-slot:activator="{ on }">
                   <v-icon
                     color="primary"
-                    :id="category.id"
+                    :id="cat.id"
                     dark
                     v-on="on"
-                    @click="editCategory(category)"
+                    @click="editCategory(cat)"
                   >mdi-pencil</v-icon>
                 </template>
                 <v-card>
@@ -79,30 +72,27 @@
 
                   <v-card-text>
                     <v-text-field
-                      v-model="updateCategory.name"
+                      v-model="localCategory.name"
                       :counter="100"
                       :rules="nameRules"
                       label="Category Name"
                       required
                     ></v-text-field>
 
-                    <v-text-field v-model="updateCategory.shortName" label="Short Name"></v-text-field>
-
-                    <v-text-field v-model="updateCategory.description" label="Description"></v-text-field>
+                    <v-text-field v-model="localCategory.description" label="Description"></v-text-field>
 
                     <v-btn
                       :disabled="!valid"
                       color="success"
                       class="mr-4"
                       @click="saveCategory()"
-                      @click.stop="$set(dialogEdit, category.id,  false)"
+                      @click.stop="$set(dialogEdit, cat.id,  false)"
                     >Save</v-btn>
 
                     <v-btn
                       color="error"
-                      class="mr-4"
-                      @click="addNewCategory"
-                      @click.stop="$set(dialogEdit, category.id,  false)"
+                      class="mr-4"                      
+                      @click.stop="$set(dialogEdit, cat.id,  false)"
                     >Cancel</v-btn>
                   </v-card-text>
 
@@ -117,7 +107,7 @@
             <td>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                  <v-icon color="red" dark v-on="on" @click="deleteCategory(category.id)">mdi-delete</v-icon>
+                  <v-icon color="red" dark v-on="on" @click="deleteCategory(cat)">mdi-delete</v-icon>
                 </template>
                 <span>Delete Category</span>
               </v-tooltip>
@@ -128,100 +118,82 @@
     </v-simple-table>
 
     <v-divider></v-divider>
+    <v-snackbar v-model="snackbar" :multi-line="multiLine">
+      {{ this.message }}
+      <v-btn color="red" text @click="snackbar = false">Close</v-btn>
+    </v-snackbar>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "BaseManageCategories",
 
   data() {
     return {
-      categories: null,
-      category: {
+      newCategory:{
         id: 0,
-        name: null,
-        shortName: null,
+        name: null,        
         description: null
       },
-      updateCategory: {
+      localCategory: {
         id: 0,
-        name: null,
-        shortName: null,
+        name: null,        
         description: null
       },
-      valid: true,
+      valid: false,
       name: "",
       nameRules: [v => !!v || "Name is required"],
-      select: null,
-      checkbox: false,
       dialog: false,
-      dialogEdit: []
+      dialogEdit: [],
+      message: null,
+      multiLine: true,
+      snackbar: false
     };
   },
 
   mounted() {
-    this.getCategories();
+    this.getCategoriesAction();
   },
 
   methods: {
-    getCategories: function() {
-      axios
-        .get("http://phpapi.bmgtech.ca/index.php/api/categories")
-        .then(response => (this.categories = response.data));
-    },
-    deleteCategory: function(index) {
-      if (confirm("Do you really want to delete?")) {
-        axios
-          .delete(
-            "http://phpapi.bmgtech.ca/index.php/api/categories?id=" + index
-          )
-          .then(() => {
-            this.categories.splice(
-              this.categories.findIndex(x => x.id === index),
-              1
-            );
-          })
-          .catch(() => {});
+    ...mapActions([
+      "getCategoriesAction",
+      "addCategoryAction",
+      "deleteCategoryAction",
+      "updateCategoryAction"
+    ]),
+    deleteCategory: function(category) {
+      if (confirm(`Do you want to delete categtory ${category.name}?`)) {
+        this.deleteCategoryAction(category);
+        this.message = `Category "${category.name}" deleted successfully!`;
+        this.snackbar = true;
       }
     },
     editCategory: function(category) {
-      this.updateCategory = category;
+      this.localCategory = category;
     },
-    addNewCategory: function() {
-      this.updateCategory = this.category;
+    initializeCategory: function() {
+      this.localCategory = this.newCategory;      
+      this.valid = true;
     },
     saveCategory: function() {
-      if (this.updateCategory.id > 0) {
-        axios
-          .put(
-            "http://phpapi.bmgtech.ca/index.php/api/categories?id=" +
-              this.updateCategory.id,
-            this.updateCategory
-          )
-          .then(() => {
-            this.updateCategory = this.category;
-          })
-          .catch(() => {});
-      } else {
-        axios
-          .post(
-            "http://phpapi.bmgtech.ca/index.php/api/categories",
-            this.updateCategory
-          )
-          .then(() => {
-            this.getCategories();
-            this.updateCategory = this.category;
-          })
-          .catch(() => {});
+      this.validate();
+      if (this.localCategory.id > 0) {
+        this.updateCategoryAction(this.localCategory);
+        this.message = `Category "${this.localCategory.name}" updated successfully!`;
+        this.snackbar = true;
+      } else if (this.localCategory.name !== null) {
+        this.addCategoryAction(this.localCategory);
+        this.message = `Category "${this.localCategory.name}" added successfully!`;
+        this.snackbar = true;
       }
     },
     validate() {
       if (this.$refs.form.validate()) {
-        this.snackbar = true;
+        this.snackbar = false;
       }
     }
   },

@@ -21,19 +21,30 @@ const mutations = {
   getStores(state, stores) {
     state.stores = stores;
   },
-  addStores(state, store) {
-    state.stores.unshift(store);
+  addStore(state, store) {
+    state.stores.unshift(...store);
   },
-  updateStores(state, store) {
+  updateStore(state, store) {    
     const index = state.stores.findIndex((h) => h.id === store.id);
-    state.stores.spice(index, 1, store);
-    state.stores = [...state.stoers];
+    state.stores.splice(index, 1, store);
+    state.stores = [...state.stores];
   },
-  deleteStores(state, store) {
-    state.stores = [...state.stores.filter((p) => p.id === store.id)];
+  deleteStore(state, store) {    
+    state.stores = [...state.stores.filter((p) => p.id !== store.id)];
   },
   getCategories(state, categories) {
     state.categories = categories;
+  },
+  addCategory(state, category) {
+    state.categories.unshift(...category); // mutable addition
+  },
+  updateCategory(state, category) {
+    const index = state.categories.findIndex((c) => c.id === category.id);
+    state.categories.splice(index, 1, category);
+    state.categories = [...state.categories];
+  },
+  deleteCategory(state, categoryId) {
+    state.categories = [...state.categories.filter((p) => p.id !== categoryId)];
   },
   getItems(state, items) {
     state.items = items;
@@ -73,21 +84,33 @@ const actions = {
     const stores = await dataService.getStores();
     commit("getStores", stores);
   },
-  async addStoresAction({ commit }) {
-    const store = await dataService.addStore();
-    commit("addStores", store);
+  async addStoreAction({ commit }, store) {
+    const addedStore = await dataService.addStore(store);
+    commit("addStore", addedStore);
   },
-  async updateStoresAction({ commit }) {
-    const store = await dataService.updateStore();
-    commit("updateStores", store);
+  async updateStoreAction({ commit }, store) {    
+    const updatedStore = await dataService.updateStore(store);    
+    commit("updateStore", updatedStore);
   },
-  async deleteStoresAction({ commit }) {
-    const store = await dataService.deleteStore();
-    commit("deleteStores", store);
+  async deleteStoreAction({ commit }, store) {
+    const status = await dataService.deleteStore(store);    
+    if (status) commit("deleteStore", store);
   },
   async getCategoriesAction({ commit }) {
     const categories = await dataService.getCategories();
     commit("getCategories", categories);
+  },
+  async addCategoryAction({ commit }, category) {
+    const addedCategory = await dataService.addCategory(category);
+    commit("addCategory", addedCategory);
+  },
+  async updateCategoryAction({ commit }, category) {
+    const updatedCategory = await dataService.updateCategory(category);    
+    commit("updateCategory", updatedCategory);
+  },
+  async deleteCategoryAction({ commit }, category) {
+    await dataService.deleteCategory(category);
+    commit("deleteCategory", category.id);
   },
   async getCategoryStoresAction({ commit }) {
     const categoryStores = await dataService.getCategoryStores();
@@ -150,7 +173,7 @@ const getters = {
     let children = [];
     let subChildren = [];
     try {
-      items = [];      
+      items = [];
       state.categories
         .sort((a, b) => {
           const bandA = a.name.toUpperCase();

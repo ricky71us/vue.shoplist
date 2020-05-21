@@ -3,7 +3,7 @@
     <v-form ref="form" v-model="validStore" lazy-validation>
       <v-dialog v-model="dialogStore" width="500" :key="store.id" :id="store.id">
         <template v-slot:activator="{ on }">
-          <v-icon color="primary" dark v-on="on" @click="editStore(store)">mdi-plus mdi-24px</v-icon>
+          <v-icon color="primary" dark v-on="on" @click="newStore(store)">mdi-plus mdi-24px</v-icon>
         </template>
         <v-card>
           <v-card-title class="headline grey lighten-2" primary-title>Store Details</v-card-title>
@@ -16,8 +16,6 @@
               label="Store Name"
               required
             ></v-text-field>
-
-            <v-text-field v-model="localStore.shortname" label="Short Name"></v-text-field>
 
             <v-text-field v-model="localStore.description" label="Description"></v-text-field>
 
@@ -49,7 +47,8 @@
 </template>
 
 <script>
-import axios from "axios";
+//import axios from "axios";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "savestore",
@@ -57,32 +56,28 @@ export default {
   props: ["updateStore"],
 
   computed: {
+    ...mapState(["stores"]),
     localStore: {
       get: function() {
         return { somevalue: this.updateStore };
       },
       set: function(newValue) {
         (this.id = newValue.id),
-          (this.name = newValue.name),
-          (this.shortName = newValue.shortName),
+          (this.name = newValue.name),          
           (this.description = newValue.description);
       }
     }
   },
   data() {
-    return {
-      stores: null,
+    return {      
       store: {
         id: 0,
-        name: null,
-        shortName: null,
+        name: null,        
         description: null
       },
       valid: false,
       name: "",
       nameRules: [v => !!v || "Name is required"],
-      select: null,
-      checkbox: false,
       dialog: false,
       dialogEdit: [],
       validStore: false,
@@ -91,45 +86,19 @@ export default {
   },
 
   mounted() {
-    this.getStores();
+    //this.getStoresAction();
   },
 
   methods: {
-    getStores: function() {
-      axios
-        .get("http://phpapi.bmgtech.ca/index.php/api/stores")
-        .then(response => (this.stores = response.data));
-    },
-    editStore: function(store) {
+    ...mapActions(["getStoresAction", "addStoreAction", "updateStoreAction"]),
+    newStore: function(store) {
       this.localStore = store;
     },
     addNewStore: function() {
-      this.localStore = this.store;
+      //this.localStore = this.store;
     },
-    saveStore: function() {
-      if (this.localStore.id > 0) {
-        axios
-          .put(
-            "http://phpapi.bmgtech.ca/index.php/api/stores?id=" +
-              this.localStore.id,
-            this.localStore
-          )
-          .then(() => {
-            this.localStore = this.store;
-          })
-          .catch(() => {});
-      } else {
-        axios
-          .post(
-            "http://phpapi.bmgtech.ca/index.php/api/stores",
-            this.localStore
-          )
-          .then(() => {
-            this.getStores();
-            this.localStore = this.store;
-          })
-          .catch(() => {});
-      }
+    saveStore: function() {      
+        this.addStoreAction(this.localStore);
     },
     validate() {
       if (this.$refs.form.validate()) {

@@ -22,7 +22,7 @@
               <td>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on }">
-                    <v-icon color="red" dark v-on="on" @click="deleteStore(store.id)">mdi-delete</v-icon>
+                    <v-icon color="red" dark v-on="on" @click="deleteStore(store)">mdi-delete</v-icon>
                   </template>
                   <span>Delete Store</span>
                 </v-tooltip>
@@ -38,9 +38,10 @@
 </template>
 
 <script>
-import axios from "axios";
+//import axios from "axios";
 import savestore from "@/components/SaveStore.vue";
 import editstore from "@/components/EditStore.vue";
+import { mapActions, mapState } from "vuex";
 
 export default {
   name: "BaseManageStores",
@@ -51,17 +52,14 @@ export default {
   },
   data() {
     return {
-      stores: null,
       store: {
         id: 0,
-        name: null,
-        shortName: null,
+        name: null,        
         description: null
       },
       updateStore: {
         id: 0,
-        name: null,
-        shortName: null,
+        name: null,        
         description: null
       },
       editIcon: null,
@@ -76,31 +74,19 @@ export default {
   },
 
   mounted() {
-    this.getStores();
+    this.getStoresAction();
   },
 
   methods: {
-    getStores: function() {
-      axios
-        .get("http://phpapi.bmgtech.ca/index.php/api/stores")
-        .then(response => (this.stores = response.data));
-    },
-    deleteStore: function(index) {
-      //console.log(index);
-      if (confirm("Do you really want to delete?")) {
-        axios
-          .delete("http://phpapi.bmgtech.ca/index.php/api/stores?id=" + index)
-          .then(() => {
-            //console.log(this.stores);
-            //console.log(this.stores.findIndex(x => x.id === index));
-            this.stores.splice(
-              this.stores.findIndex(x => x.id === index),
-              1
-            );
-          })
-          .catch(() => {
-            //console.log(());
-          });
+    ...mapActions([
+      "getStoresAction",
+      "addStoreAction",
+      "updateStoreAction",
+      "deleteStoreAction"
+    ]),
+    deleteStore: function(store) {      
+      if (confirm(`Do you want to delete the store ${store.name}?`)) {        
+        this.deleteStoreAction(store);
       }
     },
     editStore: function(store) {
@@ -111,27 +97,9 @@ export default {
     },
     saveStore: function() {
       if (this.updateStore.id > 0) {
-        axios
-          .put(
-            "http://phpapi.bmgtech.ca/index.php/api/stores?id=" +
-              this.updateStore.id,
-            this.updateStore
-          )
-          .then(() => {
-            this.updateStore = this.store;
-          })
-          .catch(() => {});
+        this.updateStoreAction();
       } else {
-        axios
-          .post(
-            "http://phpapi.bmgtech.ca/index.php/api/stores",
-            this.updateStore
-          )
-          .then(() => {
-            this.getStores();
-            this.updateStore = this.store;
-          })
-          .catch(() => {});
+        this.addStoreAction(this.updateStore);
       }
     },
     validate() {
@@ -139,6 +107,9 @@ export default {
         this.snackbar = true;
       }
     }
+  },
+  computed: {
+    ...mapState(["stores"])
   }
 };
 </script>
