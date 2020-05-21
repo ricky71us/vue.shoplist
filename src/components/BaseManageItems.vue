@@ -20,7 +20,7 @@
                       :rules="nameRules"
                       label="Item Name"
                       required
-                    ></v-text-field>                    
+                    ></v-text-field>
 
                     <v-text-field v-model="updateItem.description" label="Description"></v-text-field>
 
@@ -56,12 +56,7 @@
           <tr v-for="item in items" :key="item.id">
             <td>{{ item.name }}</td>
             <td>
-              <v-dialog
-                v-model="dialogEdit[item.id]"
-                width="500"
-                :key="item.id"
-                :id="item.id"
-              >
+              <v-dialog v-model="dialogEdit[item.id]" width="500" :key="item.id" :id="item.id">
                 <template v-slot:activator="{ on }">
                   <v-icon
                     color="primary"
@@ -81,7 +76,7 @@
                       :rules="nameRules"
                       label="Item Name"
                       required
-                    ></v-text-field>                    
+                    ></v-text-field>
 
                     <v-text-field v-model="updateItem.description" label="Description"></v-text-field>
 
@@ -112,7 +107,7 @@
             <td>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                  <v-icon color="red" dark v-on="on" @click="deleteItem(item.id)">mdi-delete</v-icon>
+                  <v-icon color="red" dark v-on="on" @click="deleteItem(item)">mdi-delete</v-icon>
                 </template>
                 <span>Delete Item</span>
               </v-tooltip>
@@ -123,66 +118,61 @@
     </v-simple-table>
 
     <v-divider></v-divider>
+    <v-snackbar v-model="snackbar" :multi-line="multiLine">
+      {{ this.message }}
+      <v-btn color="red" text @click="snackbar = false">Close</v-btn>
+    </v-snackbar>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+import { mapActions, mapState } from "vuex";
 
 export default {
   name: "BaseManageItems",
 
   data() {
     return {
-      items: null,
       item: {
         id: 0,
-        name: null,        
+        name: null,
         description: null
       },
       updateItem: {
         id: 0,
-        name: null,        
+        name: null,
         description: null
       },
       valid: true,
       name: "",
       nameRules: [v => !!v || "Name is required"],
-      select: null,
-      checkbox: false,
       dialog: false,
-      dialogEdit: []
+      dialogEdit: [],
+      message: null,
+      multiLine: true,
+      snackbar: false
     };
   },
 
   mounted() {
-    this.getItems();
+    this.getItemsAction();
   },
 
   methods: {
-    getItems: function() {
-      axios
-        .get("http://phpapi.bmgtech.ca/index.php/api/items")
-        .then(response => (this.items = response.data));
+    ...mapActions([
+      "getItemsAction",
+      "addItemAction",
+      "deleteItemAction",
+      "updateItemAction"
+    ]),
+    snackMessage: function(message) {
+      this.message = message;
+      this.snackbar = true;
     },
-    deleteItem: function(index) {
-      //console.log(index);
-      if (confirm("Do you really want to delete?")) {
-        axios
-          .delete(
-            "http://phpapi.bmgtech.ca/index.php/api/items?id=" + index
-          )
-          .then(() => {
-            //console.log(this.items);
-            //console.log(this.items.findIndex(x => x.id === index));
-            this.items.splice(
-              this.items.findIndex(x => x.id === index),
-              1
-            );
-          })
-          .catch(() => {
-            //console.log(());
-          });
+    deleteItem: function(item) {
+      if (confirm(`Do you really want to delete Item ${item.name}?`)) {
+        this.deleteItemAction(item);
+        this.snackMessage( `Category "${item.name}" deleted successfully!`);        
       }
     },
     editItem: function(item) {
@@ -192,39 +182,17 @@ export default {
       this.updateItem = this.item;
     },
     saveItem: function() {
-      //console.log(this.$refs.form.validate());
-      console.log(this.updateItem.id);
-      //if (this.$refs.form.validate()) {
-
       if (this.updateItem.id > 0) {
-        axios
-          .put(
-            "http://phpapi.bmgtech.ca/index.php/api/items?id=" +
-              this.updateItem.id,
-            this.updateItem
-          )
-          .then(response => {
-            console.log(response);
-            this.updateItem = this.item;
-            //console.log("Record Updated Successfully!");
-          })
-          .catch(() => {
-            //console.log(());
-          });
+        this.updateItemAction(this.updateItem);
+        this.snackMessage(
+          `Item "${this.updateItem.name}" updated successfully!`
+        );
+
       } else {
-        axios
-          .post(
-            "http://phpapi.bmgtech.ca/index.php/api/items",
-            this.updateItem
-          )
-          .then(() => {
-            this.getItems();
-            this.updateItem = this.item;
-          })
-          .catch(() => {
-            //console.log(error);
-          });
-        //}
+        this.addItemAction(this.updateItem);
+        this.snackMessage(
+          `Item "${this.updateItem.name}" added successfully!`
+        );
       }
     },
     validate() {
@@ -232,6 +200,9 @@ export default {
         this.snackbar = true;
       }
     }
+  },
+  computed: {
+    ...mapState(["items"])
   }
 };
 </script>

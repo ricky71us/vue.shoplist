@@ -24,12 +24,12 @@ const mutations = {
   addStore(state, store) {
     state.stores.unshift(...store);
   },
-  updateStore(state, store) {    
+  updateStore(state, store) {
     const index = state.stores.findIndex((h) => h.id === store.id);
     state.stores.splice(index, 1, store);
     state.stores = [...state.stores];
   },
-  deleteStore(state, store) {    
+  deleteStore(state, store) {
     state.stores = [...state.stores.filter((p) => p.id !== store.id)];
   },
   getCategories(state, categories) {
@@ -48,6 +48,17 @@ const mutations = {
   },
   getItems(state, items) {
     state.items = items;
+  },
+  addItem(state, item) {
+    state.items.unshift(...item); // mutable addition
+  },
+  updateItem(state, item) {
+    const index = state.items.findIndex((c) => c.id === item.id);
+    state.items.splice(index, 1, item);
+    state.items = [...state.items];
+  },
+  deleteItem(state, item) {    
+    state.items = [...state.items.filter((p) => p.id !== item.id)];
   },
   getCategoryStores(state, categoryStores) {
     state.categoryStores = categoryStores;
@@ -80,6 +91,7 @@ const actions = {
     const signInUser = await dataService.signIn(user);
     commit("signIn", signInUser.data);
   },
+  //Stores
   async getStoresAction({ commit }) {
     const stores = await dataService.getStores();
     commit("getStores", stores);
@@ -88,14 +100,15 @@ const actions = {
     const addedStore = await dataService.addStore(store);
     commit("addStore", addedStore);
   },
-  async updateStoreAction({ commit }, store) {    
-    const updatedStore = await dataService.updateStore(store);    
+  async updateStoreAction({ commit }, store) {
+    const updatedStore = await dataService.updateStore(store);
     commit("updateStore", updatedStore);
   },
   async deleteStoreAction({ commit }, store) {
-    const status = await dataService.deleteStore(store);    
-    if (status) commit("deleteStore", store);
+    await dataService.deleteStore(store);
+    commit("deleteStore", store);
   },
+  // categories
   async getCategoriesAction({ commit }) {
     const categories = await dataService.getCategories();
     commit("getCategories", categories);
@@ -105,24 +118,34 @@ const actions = {
     commit("addCategory", addedCategory);
   },
   async updateCategoryAction({ commit }, category) {
-    const updatedCategory = await dataService.updateCategory(category);    
+    const updatedCategory = await dataService.updateCategory(category);
     commit("updateCategory", updatedCategory);
   },
   async deleteCategoryAction({ commit }, category) {
     await dataService.deleteCategory(category);
     commit("deleteCategory", category.id);
   },
-  async getCategoryStoresAction({ commit }) {
-    const categoryStores = await dataService.getCategoryStores();
-    commit("getCategoryStores", categoryStores);
-  },
-  async getStoreItemsAction({ commit }) {
-    const catStoreItems = await dataService.getCatStoreItems();
-    commit("getCatStoreItems", catStoreItems);
-  },
+  // Items
   async getItemsAction({ commit }) {
     const items = await dataService.getItems();
     commit("getItems", items);
+  },
+  async addItemAction({ commit }, item) {
+    const addedItem = await dataService.addItem(item);
+    commit("addItem", addedItem);
+  },
+  async updateItemAction({ commit }, item) {
+    const updatedItem = await dataService.updateItem(item);
+    commit("updateItem", updatedItem);
+  },
+  async deleteItemAction({ commit }, item) {
+    const status = await dataService.deleteItem(item);
+    if (status) commit("deleteItem", item);
+  },
+  //CategoryStores
+  async getCategoryStoresAction({ commit }) {
+    const categoryStores = await dataService.getCategoryStores();
+    commit("getCategoryStores", categoryStores);
   },
   async addCategoryStoreAction({ commit }, categoryStore) {
     const addedCategoryStore = await dataService.addCategoryStore(
@@ -134,8 +157,12 @@ const actions = {
     await dataService.deleteCategoryStore(categoryStore);
     commit("deleteCategoryStore", categoryStore.id);
   },
+  //item Items
+  async getStoreItemsAction({ commit }) {
+    const catStoreItems = await dataService.getCatStoreItems();
+    commit("getCatStoreItems", catStoreItems);
+  },
   async addStoreItemsAction({ commit }, storeItem) {
-    //console.log(`storeItem: ${storeItem}`);
     const addedStoreItem = await dataService.addStoreItem(storeItem);
     commit("addStoreItem", addedStoreItem);
   },

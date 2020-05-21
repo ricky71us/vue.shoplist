@@ -91,7 +91,7 @@
 
                     <v-btn
                       color="error"
-                      class="mr-4"                      
+                      class="mr-4"
                       @click.stop="$set(dialogEdit, cat.id,  false)"
                     >Cancel</v-btn>
                   </v-card-text>
@@ -133,14 +133,14 @@ export default {
 
   data() {
     return {
-      newCategory:{
+      newCategory: {
         id: 0,
-        name: null,        
+        name: null,
         description: null
       },
       localCategory: {
         id: 0,
-        name: null,        
+        name: null,
         description: null
       },
       valid: false,
@@ -165,30 +165,35 @@ export default {
       "deleteCategoryAction",
       "updateCategoryAction"
     ]),
+    snackMessage: function(message) {
+      this.message = message;
+      this.snackbar = true;
+    },
     deleteCategory: function(category) {
       if (confirm(`Do you want to delete categtory ${category.name}?`)) {
         this.deleteCategoryAction(category);
-        this.message = `Category "${category.name}" deleted successfully!`;
-        this.snackbar = true;
+        this.snackMessage(`Category "${category.name}" deleted successfully!`);
       }
     },
     editCategory: function(category) {
       this.localCategory = category;
     },
     initializeCategory: function() {
-      this.localCategory = this.newCategory;      
+      this.localCategory = this.newCategory;
       this.valid = true;
     },
     saveCategory: function() {
       this.validate();
       if (this.localCategory.id > 0) {
         this.updateCategoryAction(this.localCategory);
-        this.message = `Category "${this.localCategory.name}" updated successfully!`;
-        this.snackbar = true;
+        this.snackMessage(
+          `Category "${this.localCategory.name}" updated successfully!`
+        );
       } else if (this.localCategory.name !== null) {
         this.addCategoryAction(this.localCategory);
-        this.message = `Category "${this.localCategory.name}" added successfully!`;
-        this.snackbar = true;
+        this.snackMessage(
+          `Category "${this.localCategory.name}" added successfully!`
+        );
       }
     },
     validate() {

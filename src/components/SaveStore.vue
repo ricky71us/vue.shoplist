@@ -3,7 +3,7 @@
     <v-form ref="form" v-model="validStore" lazy-validation>
       <v-dialog v-model="dialogStore" width="500" :key="store.id" :id="store.id">
         <template v-slot:activator="{ on }">
-          <v-icon color="primary" dark v-on="on" @click="newStore(store)">mdi-plus mdi-24px</v-icon>
+          Name <v-icon color="primary" dark v-on="on" @click="newStore(store)">mdi-plus mdi-24px</v-icon>(Add New Store)
         </template>
         <v-card>
           <v-card-title class="headline grey lighten-2" primary-title>Store Details</v-card-title>
@@ -84,11 +84,7 @@ export default {
       dialogStore: false
     };
   },
-
-  mounted() {
-    //this.getStoresAction();
-  },
-
+  
   methods: {
     ...mapActions(["getStoresAction", "addStoreAction", "updateStoreAction"]),
     newStore: function(store) {
@@ -99,6 +95,7 @@ export default {
     },
     saveStore: function() {      
         this.addStoreAction(this.localStore);
+        this.$emit('add-store', `Store '${this.localStore.name}' added successfully!`);
     },
     validate() {
       if (this.$refs.form.validate()) {

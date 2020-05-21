@@ -94,7 +94,7 @@ const addCategory = async function(category) {
 };
 
 const updateCategory = async function(category) {
-  try {    
+  try {
     const response = await axios.put(
       `${API}/categories?id=${category.id}`,
       category
@@ -127,6 +127,39 @@ const getItems = async function() {
     let data = parseList(response);
     return data;
   } catch (error) {
+    return [];
+  }
+};
+
+const addItem = async function(item) {
+  try {    
+    const response = await axios.post(`${API}/items`, item);
+    const addedItem = parseItem(response, 201);
+    return addedItem;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+const updateItem = async function(item) {
+  try {
+    const response = await axios.put(`${API}/items?id=${item.id}`, item);
+    parseItem(response, 200);
+    return item;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+const deleteItem = async function(item) {
+  try {
+    const response = await axios.delete(`${API}/items?id=${item.id}`, item);
+    let data = parseList(response);
+    return data;
+  } catch (error) {
+    console.log(error);
     return [];
   }
 };
@@ -192,14 +225,12 @@ const addStoreItem = async function(storeItem) {
 };
 
 const deleteCatStoreItem = async function(catStoreItem) {
-  try {
-    console.log(catStoreItem);
+  try {    
     const response = await axios.delete(
       `${API}/storeitems?id=${catStoreItem.id}`,
       catStoreItem
     );
-    let data = parseList(response);
-    console.log(response);
+    let data = parseList(response);    
     return data;
   } catch (error) {
     console.log(error);
@@ -207,8 +238,7 @@ const deleteCatStoreItem = async function(catStoreItem) {
   }
 };
 
-const parseList = (response) => {
-  //console.log(response.status);
+const parseList = (response) => {  
   if (response.status !== 200) throw Error(response.data);
   if (!response) return [];
   let list = response.data;
@@ -224,9 +254,7 @@ export const parseItem = (response, code) => {
   let item = response;
   if (typeof item !== "object") {
     item = undefined;
-  }
-  //console.log(`Parsed Item with code ${code} - ${item}`)
-  //console.log(item);
+  }  
   return item.data;
 };
 
@@ -242,10 +270,13 @@ export const dataService = {
   updateCategory,
   deleteCategory,
   getItems,
+  addItem,
+  updateItem,
+  deleteItem,
   getCategoryStores,
-  getCatStoreItems,
   addCategoryStore,
   deleteCategoryStore,
+  getCatStoreItems,
   addStoreItem,
   deleteCatStoreItem,
 };

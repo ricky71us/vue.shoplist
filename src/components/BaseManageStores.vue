@@ -6,8 +6,7 @@
           <thead>
             <tr>
               <th class="text-left">
-                Name
-                <savestore updateStore="this.updateStore"></savestore>
+                <savestore updateStore="this.updateStore" v-on:add-store="snackMessage"></savestore>
               </th>
               <th class="text-left">Edit</th>
               <th class="text-left">Delete</th>
@@ -17,7 +16,10 @@
             <tr v-for="store in stores" :key="store.id">
               <td>{{ store.name }}</td>
               <td>
-                <editstore v-bind:updateStore="store"></editstore>
+                <editstore
+                  v-bind:updateStore="store"
+                  v-on:update-store="snackMessage"
+                ></editstore>
               </td>
               <td>
                 <v-tooltip bottom>
@@ -34,6 +36,10 @@
 
       <v-divider></v-divider>
     </v-form>
+    <v-snackbar v-model="snackbar" :multi-line="multiLine">
+      {{ this.message }}
+      <v-btn color="red" text @click="snackbar = false">Close</v-btn>
+    </v-snackbar>
   </div>
 </template>
 
@@ -54,12 +60,12 @@ export default {
     return {
       store: {
         id: 0,
-        name: null,        
+        name: null,
         description: null
       },
       updateStore: {
         id: 0,
-        name: null,        
+        name: null,
         description: null
       },
       editIcon: null,
@@ -69,7 +75,10 @@ export default {
       select: null,
       checkbox: false,
       dialog: false,
-      dialogEdit: []
+      dialogEdit: [],
+      message: null,
+      multiLine: true,
+      snackbar: false
     };
   },
 
@@ -84,9 +93,14 @@ export default {
       "updateStoreAction",
       "deleteStoreAction"
     ]),
-    deleteStore: function(store) {      
-      if (confirm(`Do you want to delete the store ${store.name}?`)) {        
+    snackMessage: function(message) {      
+      this.message = message;
+      this.snackbar = true;
+    },
+    deleteStore: function(store) {
+      if (confirm(`Do you want to delete the store ${store.name}?`)) {
         this.deleteStoreAction(store);
+        this.snackMessage(`Store "${store.name}" deleted successfully!`);
       }
     },
     editStore: function(store) {
@@ -94,13 +108,6 @@ export default {
     },
     addNewStore: function() {
       this.updateStore = this.store;
-    },
-    saveStore: function() {
-      if (this.updateStore.id > 0) {
-        this.updateStoreAction();
-      } else {
-        this.addStoreAction(this.updateStore);
-      }
     },
     validate() {
       if (this.$refs.form.validate()) {

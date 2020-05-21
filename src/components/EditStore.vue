@@ -94,11 +94,7 @@ export default {
       dialogEdit: []
     };
   },
-
-  mounted() {
-    //this.getStoresAction();
-  },
-
+   
   methods: {
     ...mapActions(["getStoresAction", "addStoreAction", "updateStoreAction"]),
     editStore: function(store) {
@@ -109,7 +105,8 @@ export default {
     },
     saveStore: function() {
       if (this.localStore.id > 0) {
-        this.updateStoreAction(this.localStore);
+        this.updateStoreAction(this.localStore);        
+        this.$emit('update-store', `Store '${this.updateStore.name}' updated successfully!`);
       }
     },
     validate() {
