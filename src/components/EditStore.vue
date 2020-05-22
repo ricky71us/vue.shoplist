@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <v-form ref="form" v-model="validStore" lazy-validation>
+    <v-form ref="form" v-model="validStore" >
       <v-dialog
         v-model="dialogEdit[localStore.id]"
         width="500"
@@ -106,7 +106,7 @@ export default {
     saveStore: function() {
       if (this.localStore.id > 0) {
         this.updateStoreAction(this.localStore);        
-        this.$emit('update-store', `Store '${this.updateStore.name}' updated successfully!`);
+        this.$emit('update-store', `Store '${this.localStore.name}' updated successfully!`);
       }
     },
     validate() {

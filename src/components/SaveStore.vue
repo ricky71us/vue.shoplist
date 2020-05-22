@@ -1,9 +1,10 @@
 <template>
   <div id="app">
-    <v-form ref="form" v-model="validStore" lazy-validation>
+    <v-form ref="form" v-model="valid" >
       <v-dialog v-model="dialogStore" width="500" :key="store.id" :id="store.id">
         <template v-slot:activator="{ on }">
-          Name <v-icon color="primary" dark v-on="on" @click="newStore(store)">mdi-plus mdi-24px</v-icon>(Add New Store)
+          Name
+          <v-icon color="primary" dark v-on="on" @click="newStore()">mdi-plus mdi-24px</v-icon>(Add New Store)
         </template>
         <v-card>
           <v-card-title class="headline grey lighten-2" primary-title>Store Details</v-card-title>
@@ -20,7 +21,7 @@
             <v-text-field v-model="localStore.description" label="Description"></v-text-field>
 
             <v-btn
-              :disabled="!validStore"
+              :disabled="!valid"
               color="success"
               class="mr-4"
               @click="saveStore()"
@@ -47,7 +48,6 @@
 </template>
 
 <script>
-//import axios from "axios";
 import { mapState, mapActions } from "vuex";
 
 export default {
@@ -63,44 +63,50 @@ export default {
       },
       set: function(newValue) {
         (this.id = newValue.id),
-          (this.name = newValue.name),          
+          (this.name = newValue.name),
           (this.description = newValue.description);
       }
     }
   },
   data() {
-    return {      
+    return {
       store: {
         id: 0,
-        name: null,        
+        name: null,
         description: null
       },
-      valid: false,
       name: "",
       nameRules: [v => !!v || "Name is required"],
       dialog: false,
       dialogEdit: [],
-      validStore: false,
+      valid: false,
       dialogStore: false
     };
   },
-  
+
   methods: {
     ...mapActions(["getStoresAction", "addStoreAction", "updateStoreAction"]),
-    newStore: function(store) {
-      this.localStore = store;
+    newStore: function() {      
+      this.localStore = this.store;
     },
     addNewStore: function() {
       //this.localStore = this.store;
     },
-    saveStore: function() {      
+    saveStore: function() {
+      this.$refs.form.validate();      
+      if (this.$refs.form.validate()) {
         this.addStoreAction(this.localStore);
-        this.$emit('add-store', `Store '${this.localStore.name}' added successfully!`);
+        this.$emit(
+          "add-store",
+          `Store '${this.localStore.name}' added successfully!`
+        );
+      }
+      else{
+        this.dialogStore = false;
+      }
     },
     validate() {
-      if (this.$refs.form.validate()) {
-        this.snackbar = true;
-      }
+      return this.$refs.form.validate();
     }
   }
 };
