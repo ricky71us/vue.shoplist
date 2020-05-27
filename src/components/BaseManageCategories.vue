@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <v-form ref="form" v-model="valid" >
+    <v-form ref="form" v-model="valid">
       <v-simple-table>
         <template v-slot:default>
           <thead>
@@ -181,16 +181,21 @@ export default {
       }
     },
     editCategory: function(category) {
-      this.localCategory = category;
+      this.localCategory = {
+        id: category.id,
+        name: category.name,
+        description: category.description
+      };      
     },
-    initializeCategory: function() {
+    initializeCategory: function() {      
       this.$refs.form.validate();
       this.localCategory = {
         name: "",
         description: ""
       };
+      if (!this.dialog) this.dialog = true;
     },
-    saveCategory: function() {      
+    saveCategory: function() {
       if (this.$refs.form.validate()) {
         if (this.localCategory.id > 0) {
           this.updateCategoryAction(this.localCategory);

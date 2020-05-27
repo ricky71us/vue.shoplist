@@ -38,8 +38,8 @@ const mutations = {
   addCategory(state, category) {
     state.categories.unshift(...category); // mutable addition
   },
-  updateCategory(state, category) {
-    const index = state.categories.findIndex((c) => c.id === category.id);
+  updateCategory(state, category) {    
+    const index = state.categories.findIndex((c) => c.id === category.id);    
     state.categories.splice(index, 1, category);
     state.categories = [...state.categories];
   },
@@ -54,10 +54,11 @@ const mutations = {
   },
   updateItem(state, item) {
     const index = state.items.findIndex((c) => c.id === item.id);
+    //console.log(`item index of ${item.name} ; ${item.id} --> ${index}`);
     state.items.splice(index, 1, item);
     state.items = [...state.items];
   },
-  deleteItem(state, item) {    
+  deleteItem(state, item) {
     state.items = [...state.items.filter((p) => p.id !== item.id)];
   },
   getCategoryStores(state, categoryStores) {

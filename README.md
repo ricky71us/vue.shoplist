@@ -1,4 +1,4 @@
-# vuextest
+# shoplist
 
 ## Project setup
 ```

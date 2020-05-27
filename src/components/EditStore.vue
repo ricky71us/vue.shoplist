@@ -58,15 +58,14 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
   name: "editstore",
 
   props: ["updateStore"],
 
-  computed: {
-    ...mapState(["stores"]),
+  computed: {    
     localStore: {
       get: function() {        
         return this.updateStore;
@@ -98,11 +97,12 @@ export default {
   methods: {
     ...mapActions(["getStoresAction", "addStoreAction", "updateStoreAction"]),
     editStore: function(store) {
-      this.localStore = store;
+      this.localStore.name = store.name;
+      this.localStore.description = store.description;
     },
-    addNewStore: function() {
-      //this.localStore = this.localStore;
-    },
+     addNewStore: function() {
+    //   //this.localStore = this.localStore;
+     },
     saveStore: function() {
       if (this.localStore.id > 0) {
         this.updateStoreAction(this.localStore);        

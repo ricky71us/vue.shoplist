@@ -9,7 +9,7 @@
                 Name
                 <v-dialog v-model="dialog" width="500" :key="item.id" :id="item.id">
                   <template v-slot:activator="{ on }">
-                    <v-icon color="primary" dark v-on="on" @click="editItem(item)">mdi-plus</v-icon>(Add New Item)
+                    <v-icon color="primary" dark v-on="on" @click="initializeItem()">mdi-plus</v-icon>(Add New Item)
                   </template>
                   <v-card>
                     <v-card-title class="headline grey lighten-2" primary-title>Item Details</v-card-title>
@@ -71,14 +71,14 @@
 
                     <v-card-text>
                       <v-text-field
-                        v-model="updateItem.name"
+                        v-model="tempItem.name"
                         :counter="100"
                         :rules="nameRules"
                         label="Item Name"
                         required
                       ></v-text-field>
 
-                      <v-text-field v-model="updateItem.description" label="Description"></v-text-field>
+                      <v-text-field v-model="tempItem.description" label="Description"></v-text-field>
 
                       <v-btn
                         :disabled="!valid"
@@ -143,6 +143,11 @@ export default {
         name: null,
         description: null
       },
+      tempItem: {
+        id: 0,
+        name: null,
+        description: null
+      },
       valid: true,
       name: "",
       nameRules: [v => !!v || "Name is required"],
@@ -176,25 +181,29 @@ export default {
       }
     },
     editItem: function(item) {
-      this.updateItem = item;
+      this.tempItem = {
+        id: item.id,
+        name: item.name,
+        description: item.description
+      };
     },
-    initializeItem: function(){
+    initializeItem: function() {
       this.$refs.form.validate();
       this.updateItem = {
         id: 0,
         name: "",
         description: ""
-      }
+      };
     },
     addNewItem: function() {
-      this.updateItem = this.item;
+      //this.updateItem = this.item;
     },
     saveItem: function() {
       if (this.$refs.form.validate()) {
-        if (this.updateItem.id > 0) {
-          this.updateItemAction(this.updateItem);
+        if (this.tempItem.id > 0) {
+          this.updateItemAction(this.tempItem);
           this.snackMessage(
-            `Item "${this.updateItem.name}" updated successfully!`
+            `Item "${this.tempItem.name}" updated successfully!`
           );
         } else {
           this.addItemAction(this.updateItem);
@@ -202,8 +211,6 @@ export default {
             `Item "${this.updateItem.name}" added successfully!`
           );
         }
-      } else {
-        this.dialog = false;
       }
     },
     validate() {
@@ -213,7 +220,10 @@ export default {
     }
   },
   computed: {
-    ...mapState(["items"])
+    ...mapState(["items"]),
+    sortedItems: function(){
+      return 0;
+    }
   }
 };
 </script>

@@ -16,10 +16,7 @@
             <tr v-for="store in stores" :key="store.id">
               <td>{{ store.name }}</td>
               <td>
-                <editstore
-                  v-bind:updateStore="store"
-                  v-on:update-store="snackMessage"
-                ></editstore>
+                <editstore v-bind:updateStore="editStore(store)" v-on:update-store="snackMessage"></editstore>
               </td>
               <td>
                 <v-tooltip bottom>
@@ -44,7 +41,6 @@
 </template>
 
 <script>
-//import axios from "axios";
 import savestore from "@/components/SaveStore.vue";
 import editstore from "@/components/EditStore.vue";
 import { mapActions, mapState } from "vuex";
@@ -93,7 +89,7 @@ export default {
       "updateStoreAction",
       "deleteStoreAction"
     ]),
-    snackMessage: function(message) {      
+    snackMessage: function(message) {
       this.message = message;
       this.snackbar = true;
     },
@@ -104,15 +100,7 @@ export default {
       }
     },
     editStore: function(store) {
-      this.updateStore = store;
-    },
-    addNewStore: function() {
-      this.updateStore = this.store;
-    },
-    validate() {
-      if (this.$refs.form.validate()) {
-        this.snackbar = true;
-      }
+      return { id: store.id, name: store.name, description: store.description };
     }
   },
   computed: {

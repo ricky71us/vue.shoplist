@@ -103,9 +103,8 @@ export default {
           email: this.email,
           password: this.password,
           phone: this.phone
-        };
-        console.log("inside");
-        await dataService.register(data).then(response => {
+        };        
+        await dataService.register(data).then(response => {          
           this.msg = response.message;
           this.isMsg = !(this.msg === "");
           console.log(this.msg.length);

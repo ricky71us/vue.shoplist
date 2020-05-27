@@ -15,13 +15,16 @@ const signIn = async function(user) {
 };
 
 const register = async function(user) {
+  
   try {
     const response = await axios.post(
       `${API}/authentication/registration`,
       user
     );
+    
     const userInfo = parseItem(response, 200);
-    return userInfo.data;
+    
+    return userInfo;
   } catch (error) {
     console.error(error);
     console.error(error.message);

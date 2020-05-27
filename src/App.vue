@@ -17,6 +17,9 @@ export default {
 
   methods: {
     ...mapActions(["signInAction"]),
+     track () {
+      this.$ga.page('/')
+    },
     async signInUser() {
       var userInfo = {
         email: "bhupathy4444@yahoo.com",
