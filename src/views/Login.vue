@@ -72,7 +72,7 @@ export default {
         };
         await this.signInAction(userInfo);
         if (this.currentUser !== null)
-          this.$router.push({ path: "/dashboard" });
+          this.$router.push({ path: "/home" });
         else {
           this.msg = "Invalid Credentials";
           this.isMsg = !(this.msg === "");

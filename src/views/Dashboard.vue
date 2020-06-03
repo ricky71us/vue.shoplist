@@ -31,7 +31,6 @@ export default {
     this.getAllStores();
   },
   mounted() {
-    console.log("mounted");
   },
   methods: {
     ...mapActions(["getStoresAction"]),

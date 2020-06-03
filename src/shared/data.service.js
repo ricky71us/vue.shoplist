@@ -4,8 +4,10 @@ import { API } from "./config";
 
 const signIn = async function(user) {
   try {
+    console.log('Sign in user');
     const response = await axios.post(`${API}/authentication/login`, user);
     const userInfo = parseItem(response, 200);
+    console.log(userInfo);
     return userInfo.data;
   } catch (error) {
     console.error(error);
@@ -43,18 +45,22 @@ const getStores = async function() {
 };
 
 const addStore = async function(store) {
+  var response = null;
   try {
-    const response = await axios.post(`${API}/stores`, store);
+    response = await axios.post(`${API}/stores`, store);
+    console.log(response);
     const addedStore = parseItem(response, 201);
     return addedStore;
   } catch (error) {
-    console.log(error);
+    console.log(store);    
+    console.log(error)
     return error.message;
   }
 };
 
 const updateStore = async function(store) {
   try {
+    console.log(store);
     const response = await axios.put(`${API}/stores?id=${store.id}`, store);
     parseItem(response, 200);
     return store;
@@ -218,8 +224,10 @@ const deleteCategoryStore = async function(categoryStore) {
 
 const addStoreItem = async function(storeItem) {
   try {
+    console.log(storeItem);
     const response = await axios.post(`${API}/storeitems`, storeItem);
     const addedStoreItem = parseItem(response, 201);
+    console.log(addedStoreItem);
     return addedStoreItem;
   } catch (error) {
     console.error(error);

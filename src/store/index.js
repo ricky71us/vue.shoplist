@@ -1,13 +1,13 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import { dataService } from "../shared";
+import createPersistedState from 'vuex-persistedstate';
 
 Vue.use(Vuex);
 
 const state = {
-  user: { id: "", name: "" },
-  stores: [],
-  itemCategory: [],
+  user: { id: "", email: "", firstname: "", lastname: "", phone: "" },
+  stores: [],  
   items: [],
   categories: [],
   categoryStores: [],
@@ -15,8 +15,12 @@ const state = {
 };
 
 const mutations = {
-  signIn(state, user) {
+  clearUser(state, user){
+    console.log(user);
     state.user = user;
+  },
+  signIn(state, signInUser) {    
+    state.user = signInUser;
   },
   getStores(state, stores) {
     state.stores = stores;
@@ -38,8 +42,8 @@ const mutations = {
   addCategory(state, category) {
     state.categories.unshift(...category); // mutable addition
   },
-  updateCategory(state, category) {    
-    const index = state.categories.findIndex((c) => c.id === category.id);    
+  updateCategory(state, category) {
+    const index = state.categories.findIndex((c) => c.id === category.id);
     state.categories.splice(index, 1, category);
     state.categories = [...state.categories];
   },
@@ -88,9 +92,13 @@ const mutations = {
 };
 
 const actions = {
+  async clearUserAction({commit}, user){
+    console.log('inside clear user action');
+    commit("clearUser", user);
+  },
   async signInAction({ commit }, user) {
-    const signInUser = await dataService.signIn(user);
-    commit("signIn", signInUser.data);
+    const signInUser = await dataService.signIn(user);    
+    commit("signIn", signInUser);
   },
   //Stores
   async getStoresAction({ commit }) {
@@ -267,4 +275,5 @@ export default new Vuex.Store({
   mutations,
   actions,
   getters,
+  plugins: [createPersistedState()],
 });

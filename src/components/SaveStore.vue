@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <v-form ref="form" v-model="valid" >
+    <v-form ref="form" v-model="valid">
       <v-dialog v-model="dialogStore" width="500" :key="store.id" :id="store.id">
         <template v-slot:activator="{ on }">
           Name
@@ -59,12 +59,10 @@ export default {
     ...mapState(["stores"]),
     localStore: {
       get: function() {
-        return { somevalue: this.updateStore };
+        return { id: 0, name: "", description: "" };
       },
       set: function(newValue) {
-        (this.id = newValue.id),
-          (this.name = newValue.name),
-          (this.description = newValue.description);
+        (this.name = newValue.name), (this.description = newValue.description);
       }
     }
   },
@@ -72,8 +70,8 @@ export default {
     return {
       store: {
         id: 0,
-        name: null,
-        description: null
+        name: "",
+        description: ""
       },
       name: "",
       nameRules: [v => !!v || "Name is required"],
@@ -86,22 +84,22 @@ export default {
 
   methods: {
     ...mapActions(["getStoresAction", "addStoreAction", "updateStoreAction"]),
-    newStore: function() {      
-      this.localStore = this.store;
+    newStore: function() {
+      this.localStore = { id: 0, name: "", description: "" };
+      console.log(this.localStore);
     },
     addNewStore: function() {
-      //this.localStore = this.store;
+      this.localStore = { id: 0, name: "", description: "" };
     },
     saveStore: function() {
-      this.$refs.form.validate();      
+      this.$refs.form.validate();
       if (this.$refs.form.validate()) {
         this.addStoreAction(this.localStore);
         this.$emit(
           "add-store",
           `Store '${this.localStore.name}' added successfully!`
         );
-      }
-      else{
+      } else {
         this.dialogStore = false;
       }
     },
